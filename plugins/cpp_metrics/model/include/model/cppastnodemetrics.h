@@ -17,8 +17,9 @@ struct CppAstNodeMetrics
   {
     PARAMETER_COUNT = 1,
     MCCABE = 2,
-    LACK_OF_COHESION = 3,
-    LACK_OF_COHESION_HS = 4,
+    BUMPY_ROAD = 3,
+    LACK_OF_COHESION = 4,
+    LACK_OF_COHESION_HS = 5,
   };
 
   #pragma db id auto
@@ -40,6 +41,25 @@ struct CppAstNodeMetrics
     CppRecord::astNodeId == CppAstNodeMetrics::astNodeId)
 struct CppRecordMetricsView
 {
+  #pragma db column(CppAstNodeMetrics::value)
+  double value;
+};
+
+#pragma db view \
+  object(CppAstNodeMetrics) \
+  object(CppAstNode : CppAstNodeMetrics::astNodeId == CppAstNode::id) \
+  object(File = LocFile : CppAstNode::location.file)
+struct CppAstNodeMetricsForPathView
+{
+  #pragma db column(CppAstNodeMetrics::astNodeId)
+  CppAstNodeId astNodeId;
+
+  #pragma db column(LocFile::path)
+  std::string path;
+
+  #pragma db column(CppAstNodeMetrics::type)
+  CppAstNodeMetrics::Type type;
+
   #pragma db column(CppAstNodeMetrics::value)
   double value;
 };
